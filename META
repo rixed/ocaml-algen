@@ -1,0 +1,4 @@
+description = "Basic generic numbers"
+version = "1"
+archive(byte) = "algen.cma"
+archive(native) = "algen.cmxa"
