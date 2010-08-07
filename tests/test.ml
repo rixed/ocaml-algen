@@ -50,5 +50,7 @@ end
 module M1 = CheckField (FloatField)
 module M2 = CheckField (IntField (struct let v = 10 end))
 module M3 = CheckField (IntField (struct let v = 0 end))
+module M4 = CheckField (NatIntField (struct let v = 10 end))
+module M5 = CheckField (NatIntField (struct let v = 0 end))
 
 
