@@ -72,10 +72,9 @@ struct
 		c
 end
 
-module ExtendedGroup (G : GROUP) =
+module GroupExtension (G : GROUP) =
 struct
-	include G
-
+	open G
 	let sub a b = add a (neg b)
 
 	let adds l =
@@ -91,6 +90,12 @@ struct
 	let abs a = max a (neg a)
 
 	let double a = add a a
+end
+
+module ExtendedGroup (G : GROUP) =
+struct
+	include G
+	include GroupExtension (G)
 end
 
 (* unitary RINGS *)
@@ -124,9 +129,10 @@ struct
 		b
 end
 
-module ExtendedRing (R : RING) =
+module RingExtension (R : RING) =
 struct
-	include R
+	open R
+	include GroupExtension (R)
 
 	let muls l =
 		let rec aux res = function
@@ -143,14 +149,12 @@ struct
 		done ;
 		!res
 
-	module Ge = ExtendedGroup (R)
+end
 
-	let sub = Ge.sub
-	let adds = Ge.adds
-	let min = Ge.min
-	let max = Ge.max
-	let abs = Ge.abs
-	let double = Ge.double
+module ExtendedRing (R : RING) =
+struct
+	include R
+	include RingExtension (R)
 end
 
 (* FIELD *)
@@ -161,6 +165,9 @@ sig
 
 	exception Not_invertible
 	val inv : t -> t
+
+	val rand : t -> t
+	(** [rand bound] returns a value between [zero] and bound. *)
 end
 
 module CheckedField (F : FIELD) =
@@ -170,17 +177,31 @@ struct
 	exception Not_invertible
 
 	let inv a = check_inversion F.inv mul a one
+
+	let rand bound =
+		let r = F.rand bound in
+		assert (compare r zero >= 0) ;
+		assert (compare r bound < 0) ;
+		r
 end
 
-module ExtendedField (K : FIELD) =
+module FieldExtension (K : FIELD) =
 struct
-	include K
+	open K
+	include RingExtension (K)
+	include GroupExtension (K)
 
 	let div a b = mul a (inv b)
 
 	let half a =
 		let semi_one = inv (add one one) in
 		mul semi_one a
+end
+
+module ExtendedField (K : FIELD) =
+struct
+	include K
+	include FieldExtension (K)
 end
 
 (* VECTOR SPACE *)
@@ -257,15 +278,14 @@ struct
 			a
 end
 
-module ExtendedVector (V : VECTOR) =
+module VectorExtension (V : VECTOR) =
 struct
-	include V
-	module Ke = ExtendedField (K)
-	module Ge = ExtendedGroup (K)
+	open V
+	module Ke = ExtendedField (V.K)
 
 	let make_unit d = Array.init Dim.v (fun i -> if i = d then K.one else K.zero)
 
-	let sub a b = Array.init Dim.v (fun i -> Ge.sub a.(i) b.(i))
+	let sub a b = Array.init Dim.v (fun i -> Ke.sub a.(i) b.(i))
 
 	let half a = Array.init Dim.v (fun i -> Ke.half a.(i))
 
@@ -281,7 +301,7 @@ struct
 	let vect_product a b =
 		let dual = Array.init Dim.v (fun i ->
 			let j = if i + 1 >= Dim.v then 0 else i + 1  in
-			Ge.sub (K.mul a.(i) b.(j)) (K.mul a.(j) b.(i))) in
+			Ke.sub (K.mul a.(i) b.(j)) (K.mul a.(j) b.(i))) in
 		Array.init Dim.v (fun i ->
 			let res = ref K.zero in
 			for j = 1 to (Dim.v-1) do
@@ -308,14 +328,20 @@ struct
 		let bbox_make v = v, v
 
 		let bbox_union (am, aM) (bm, bM) =
-			Array.init Dim.v (fun i -> Ge.min am.(i) bm.(i)),
-			Array.init Dim.v (fun i -> Ge.max aM.(i) bM.(i))
+			Array.init Dim.v (fun i -> Ke.min am.(i) bm.(i)),
+			Array.init Dim.v (fun i -> Ke.max aM.(i) bM.(i))
 
 		let bbox_add a v = bbox_union a (bbox_make v)
 
 		let print fmt (am, aM) =
 			Format.printf fmt "@[<BBOX:@ %k ->@ %k >@]" (print am) am (print aM) aM
 	end
+end
+
+module ExtendedVector (V : VECTOR) =
+struct
+	include V
+	include VectorExtension (V)
 end
 
 (* Another interresting case : K^([1;n]x[1;p]) MATRIX *)
@@ -358,9 +384,9 @@ struct
 		Array.iter (V.print fmt) a
 end
 
-module ExtendedMatrix (M : MATRIX) =
+module MatrixExtension (M : MATRIX) =
 struct
-	include M
+	open M
 	module Ve = ExtendedVector (V)
 
 	let transpose m =
@@ -374,6 +400,12 @@ struct
 			if i = vi then Ve.make_unit si else V.zero)
 	
 	(* trace, determinant, etc... *)
+end
+
+module ExtendedMatrix (M : MATRIX) =
+struct
+	include M
+	include MatrixExtension (M)
 end
 
 (* To be able to combine matrixes of different sizes *)

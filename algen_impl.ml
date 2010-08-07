@@ -19,6 +19,8 @@ struct
 
 	exception Not_invertible
 	let inv x = 1./.x
+
+	let rand = Random.float
 end
 
 (* Fixed size precision based on int *)
@@ -48,5 +50,7 @@ struct
 		let m = Int64.div (Int64.shift_left (Int64.of_int a) Prec.v) (Int64.of_int b) in
 		Int64.to_int m
 	let inv s = div one s
+
+	let rand = Random.int
 end
 
