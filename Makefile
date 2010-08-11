@@ -22,7 +22,7 @@ $(NAME).cmxa: $(ML_XOBJS)
 
 install: all
 	if test -f $(NAME).cmxa ; then extra="$(NAME).cmxa $(NAME).a" ; fi ; \
-	ocamlfind install $(NAME) *.cmi algen_intf.ml algen_impl.mli $(NAME).cma META $$extra
+	ocamlfind install $(NAME) *.cmi algen_intf.ml $(NAME).cma META $$extra
 
 uninstall:
 	ocamlfind remove $(NAME)
