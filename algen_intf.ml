@@ -168,18 +168,38 @@ sig
 
 	val rand : t -> t
 	(** [rand bound] returns a value between [zero] and bound. *)
+
+	(* Many fields are similar to numbers and we want to be able to convert to/from then *)
+	exception Not_convertible
+	val of_int       : int -> t
+	val to_int       : t -> int
+	val of_float     : float -> t
+	val to_float     : t -> float
+	val of_nativeint : nativeint -> t
+	val to_nativeint : t -> nativeint
+	val of_int64     : int64 -> t
+	val to_int64     : t -> int64
 end
 
-module CheckedField (F : FIELD) =
+module CheckedField (K : FIELD) =
 struct
-	include CheckedRing (F) (struct let v = true end)
-	(* CheckedRing will only include the RING elements of F : *)
+	include CheckedRing (K) (struct let v = true end)
+	(* CheckedRing will only include the RING elements of K : *)
 	exception Not_invertible
+	exception Not_convertible
+	let of_int = K.of_int
+	let to_int = K.to_int
+	let of_float = K.of_float
+	let to_float = K.to_float
+	let of_nativeint = K.of_nativeint
+	let to_nativeint = K.to_nativeint
+	let of_int64 = K.of_int64
+	let to_int64 = K.to_int64
 
-	let inv a = check_inversion F.inv mul a one
+	let inv a = check_inversion K.inv mul a one
 
 	let rand bound =
-		let r = F.rand bound in
+		let r = K.rand bound in
 		assert (compare r zero >= 0) ;
 		assert (compare r bound < 0) ;
 		r

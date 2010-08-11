@@ -2,7 +2,8 @@ open Algen_intf
 
 (* Some FIELDs to play with. *)
 
-module FloatField : FIELD with type t = float =
+module FloatField :
+	FIELD with type t = float =
 struct
 	type t = float
 	let zero = 0.
@@ -21,12 +22,22 @@ struct
 	let inv x = 1./.x
 
 	let rand = Random.float
+
+	exception Not_convertible
+	let of_int = float_of_int
+	let to_int = int_of_float
+	let of_float x = x
+	let to_float x = x
+	let of_nativeint = Nativeint.to_float
+	let to_nativeint = Nativeint.of_float
+	let of_int64 = Int64.to_float
+	let to_int64 = Int64.of_float
 end
 
 (* Fixed size precision based on int *)
 
 module IntField (Prec : CONF_INT)
-	: FIELD with type t = int (* FIXME: then the printer will be used for all ints :-< *)=
+	: FIELD with type t = int =
 struct
 	type t = int
 	let zero = 0
@@ -52,6 +63,16 @@ struct
 	let inv s = div one s
 
 	let rand = Random.int
+
+	exception Not_convertible
+	let of_int x = x
+	let to_int x = x
+	let of_float = int_of_float
+	let to_float = float_of_int
+	let of_nativeint = Nativeint.to_int
+	let to_nativeint = Nativeint.of_int
+	let of_int64 = Int64.to_int
+	let to_int64 = Int64.of_int
 end
 
 (* Same as above, but using nativeints *)
@@ -83,5 +104,15 @@ struct
 	let inv s = div one s
 
 	let rand = Random.nativeint
+
+	exception Not_convertible
+	let of_int = Nativeint.of_int
+	let to_int = Nativeint.to_int
+	let of_float = Nativeint.of_float
+	let to_float = Nativeint.to_float
+	let of_nativeint x = x
+	let to_nativeint x = x
+	let of_int64 = Int64.to_nativeint
+	let to_int64 = Int64.of_nativeint
 end
 
