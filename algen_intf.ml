@@ -419,6 +419,10 @@ struct
 		Array.init DimCol.v (fun i ->
 			if i = vi then Ve.make_unit si else V.zero)
 	
+	let init f =
+		Array.init DimCol.v (fun c ->
+			Array.init DimRow.v (fun r -> f c r))
+
 	(* trace, determinant, etc... *)
 end
 
