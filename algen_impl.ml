@@ -46,13 +46,13 @@ struct
 	let neg s = -s
 	exception Not_comparable
 	let compare = compare
-	let print ff s = Format.fprintf ff "%d.%d" (s asr Prec.v) (s land (one - 1))
-	
-	let mul a b =
-		let m = Int64.shift_right_logical (Int64.mul (Int64.of_int a) (Int64.of_int b)) Prec.v in
-		Int64.to_int m
 	let of_float f = int_of_float (f *. (float_of_int one))
 	let to_float s = (float_of_int s) /. (float_of_int one)
+	let print ff s = Format.fprintf ff "%g" (to_float s)
+	
+	let mul a b =
+		let m = Int64.shift_right (Int64.mul (Int64.of_int a) (Int64.of_int b)) Prec.v in
+		Int64.to_int m
 	exception No_root
 	let sqrt s = of_float (sqrt (to_float s))
 
@@ -65,14 +65,12 @@ struct
 	let rand = Random.int
 
 	exception Not_convertible
-	let of_int x = x
-	let to_int x = x
-	let of_float = int_of_float
-	let to_float = float_of_int
-	let of_nativeint = Nativeint.to_int
-	let to_nativeint = Nativeint.of_int
-	let of_int64 = Int64.to_int
-	let to_int64 = Int64.of_int
+	let of_int x = x lsl Prec.v
+	let to_int x = x asr Prec.v
+	let of_nativeint x = Nativeint.to_int (Nativeint.shift_left x Prec.v)
+	let to_nativeint x = Nativeint.shift_right (Nativeint.of_int x) Prec.v
+	let of_int64 x = Int64.to_int (Int64.shift_left x Prec.v)
+	let to_int64 x = Int64.shift_right (Int64.of_int x) Prec.v
 end
 
 (* Same as above, but using nativeints *)
@@ -87,13 +85,13 @@ struct
 	let neg = Nativeint.neg
 	exception Not_comparable
 	let compare = Nativeint.compare
-	let print ff s = Format.fprintf ff "%nd.%nd" (Nativeint.shift_right s Prec.v) (Nativeint.logand s (Nativeint.sub one 1n))
-
-	let mul a b =
-		let m = Int64.shift_right_logical (Int64.mul (Int64.of_nativeint a) (Int64.of_nativeint b)) Prec.v in
-		Int64.to_nativeint m
 	let of_float f = Nativeint.of_float (f *. (Nativeint.to_float one))
 	let to_float s = (Nativeint.to_float s) /. (Nativeint.to_float one)
+	let print ff s = Format.fprintf ff "%g" (to_float s)
+
+	let mul a b =
+		let m = Int64.shift_right (Int64.mul (Int64.of_nativeint a) (Int64.of_nativeint b)) Prec.v in
+		Int64.to_nativeint m
 	exception No_root
 	let sqrt s = of_float (sqrt (to_float s))
 
@@ -106,13 +104,11 @@ struct
 	let rand = Random.nativeint
 
 	exception Not_convertible
-	let of_int = Nativeint.of_int
-	let to_int = Nativeint.to_int
-	let of_float = Nativeint.of_float
-	let to_float = Nativeint.to_float
-	let of_nativeint x = x
-	let to_nativeint x = x
-	let of_int64 = Int64.to_nativeint
-	let to_int64 = Int64.of_nativeint
+	let of_int x = Nativeint.shift_left (Nativeint.of_int x) Prec.v
+	let to_int x = Nativeint.to_int (Nativeint.shift_right x Prec.v)
+	let of_nativeint x = Nativeint.shift_left x Prec.v
+	let to_nativeint x = Nativeint.shift_right x Prec.v
+	let of_int64 x = Int64.to_nativeint (Int64.shift_left x Prec.v)
+	let to_int64 x = Int64.shift_right (Int64.of_nativeint x) Prec.v
 end
 
