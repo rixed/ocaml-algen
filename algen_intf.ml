@@ -341,20 +341,27 @@ struct
 	module Bbox =
 	struct
 		type vector = t
-		type t = vector * vector
+		type t = Empty | Box of vector * vector
 
-		let empty_bbox = zero, zero
+		let empty = Empty
+		let is_empty b = b = Empty
 
-		let bbox_make v = v, v
+		let make v = Box (v, v)
 
-		let bbox_union (am, aM) (bm, bM) =
-			Array.init Dim.v (fun i -> Ke.min am.(i) bm.(i)),
-			Array.init Dim.v (fun i -> Ke.max aM.(i) bM.(i))
+		let union b1 b2 = match b1, b2 with
+			| Empty, b -> b
+			| b, Empty -> b
+			| Box (am, aM), Box (bm, bM) ->
+				Box (Array.init Dim.v (fun i -> Ke.min am.(i) bm.(i)),
+				     Array.init Dim.v (fun i -> Ke.max aM.(i) bM.(i)))
 
-		let bbox_add a v = bbox_union a (bbox_make v)
+		let add b v = union b (make v)
 
-		let print fmt (am, aM) =
-			Format.printf fmt "@[{BBOX:@ %k ->@ %k }@]" (print am) am (print aM) aM
+		let print fmt = function
+			| Empty ->
+				Format.fprintf fmt "@[{BBOX:empty}@]"
+			| Box (am, aM) ->
+				Format.fprintf fmt "@[{BBOX:@ %a ->@ %a }@]" V.print am V.print aM
 	end
 end
 
