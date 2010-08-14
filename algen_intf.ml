@@ -292,9 +292,9 @@ struct
 
 	let print fmt a =
 		Array.iteri (fun i s ->
-			if i = 0 then Format.fprintf fmt "@[<VEC:@ " ;
+			if i = 0 then Format.fprintf fmt "@[{VEC:@ " ;
 			K.print fmt s ;
-			if i < Dim.v - 1 then Format.fprintf fmt ",@ " else Format.fprintf fmt ">@]")
+			if i < Dim.v - 1 then Format.fprintf fmt ",@ " else Format.fprintf fmt "}@]")
 			a
 end
 
@@ -354,7 +354,7 @@ struct
 		let bbox_add a v = bbox_union a (bbox_make v)
 
 		let print fmt (am, aM) =
-			Format.printf fmt "@[<BBOX:@ %k ->@ %k >@]" (print am) am (print aM) aM
+			Format.printf fmt "@[{BBOX:@ %k ->@ %k }@]" (print am) am (print aM) aM
 	end
 end
 
@@ -401,7 +401,11 @@ struct
 	let compare a b = array_compare V.compare a b
 
 	let print fmt a =
-		Array.iter (V.print fmt) a
+		Array.iteri (fun i v ->
+			if i = 0 then Format.fprintf fmt "@[{MAT:@ " ;
+			V.print fmt v ;
+			if i < DimCol.v - 1 then Format.fprintf fmt ",@ " else Format.fprintf fmt "}@]"
+		) a
 end
 
 module MatrixExtension (M : MATRIX) =
