@@ -9,21 +9,17 @@ struct
 	let zero = 0.
 	let add = (+.)
 	let neg x = -.x
-	exception Not_comparable
 	let compare = compare	(* From Pervasive *)
 	let print ff s = Format.pp_print_float ff s
 	
 	let one = 1.
 	let mul = ( *.)
-	exception No_root
 	let sqrt = sqrt
 
-	exception Not_invertible
 	let inv x = 1./.x
 
 	let rand = Random.float
 
-	exception Not_convertible
 	let of_int = float_of_int
 	let to_int = int_of_float
 	let of_float x = x
@@ -44,7 +40,6 @@ struct
 	let one = 1 lsl Prec.v
 	let add = (+)
 	let neg s = -s
-	exception Not_comparable
 	let compare = compare
 	let of_float f = int_of_float (f *. (float_of_int one))
 	let to_float s = (float_of_int s) /. (float_of_int one)
@@ -53,10 +48,8 @@ struct
 	let mul a b =
 		let m = Int64.shift_right (Int64.mul (Int64.of_int a) (Int64.of_int b)) Prec.v in
 		Int64.to_int m
-	exception No_root
 	let sqrt s = of_float (sqrt (to_float s))
 
-	exception Not_invertible
 	let div a b =
 		let m = Int64.div (Int64.shift_left (Int64.of_int a) Prec.v) (Int64.of_int b) in
 		Int64.to_int m
@@ -64,7 +57,6 @@ struct
 
 	let rand = Random.int
 
-	exception Not_convertible
 	let of_int x = x lsl Prec.v
 	let to_int x = x asr Prec.v
 	let of_nativeint x = Nativeint.to_int (Nativeint.shift_left x Prec.v)
@@ -83,7 +75,6 @@ struct
 	let one = Nativeint.shift_left 1n Prec.v
 	let add = Nativeint.add
 	let neg = Nativeint.neg
-	exception Not_comparable
 	let compare = Nativeint.compare
 	let of_float f = Nativeint.of_float (f *. (Nativeint.to_float one))
 	let to_float s = (Nativeint.to_float s) /. (Nativeint.to_float one)
@@ -92,10 +83,8 @@ struct
 	let mul a b =
 		let m = Int64.shift_right (Int64.mul (Int64.of_nativeint a) (Int64.of_nativeint b)) Prec.v in
 		Int64.to_nativeint m
-	exception No_root
 	let sqrt s = of_float (sqrt (to_float s))
 
-	exception Not_invertible
 	let div a b =
 		let m = Int64.div (Int64.shift_left (Int64.of_nativeint a) Prec.v) (Int64.of_nativeint b) in
 		Int64.to_nativeint m
@@ -103,7 +92,6 @@ struct
 
 	let rand = Random.nativeint
 
-	exception Not_convertible
 	let of_int x = Nativeint.shift_left (Nativeint.of_int x) Prec.v
 	let to_int x = Nativeint.to_int (Nativeint.shift_right x Prec.v)
 	let of_nativeint x = Nativeint.shift_left x Prec.v

@@ -1,6 +1,11 @@
 module type CONF_BOOL = sig val v : bool end
 module type CONF_INT  = sig val v : int  end
 
+exception Not_invertible
+exception Not_comparable
+exception Not_convertible
+exception No_root
+
 (* GROUPS *)
 
 module type GROUP =
@@ -11,7 +16,6 @@ sig
 	val add     : t -> t -> t
 	val neg     : t -> t
 
-	exception Not_comparable
 	val compare : t -> t -> int
 
 	val print   : Format.formatter -> t -> unit
@@ -106,7 +110,6 @@ sig
 	val one : t
 	val mul : t -> t -> t
 
-	exception No_root
 	val sqrt : t -> t
 end
 
@@ -117,7 +120,6 @@ struct
 	include CheckedGroup (R) (struct let v = true end)
 	(* CheckedGroup will only include from R the elements of a GROUP : *)
 	let one = R.one
-	exception No_root
 
 	let mul a b =
 		check_assoc_and_neutral R.mul a b one Abelian.v
@@ -163,14 +165,12 @@ module type FIELD =
 sig
 	include RING (* where all elements but zero can be inversed for mul *)
 
-	exception Not_invertible
 	val inv : t -> t
 
 	val rand : t -> t
 	(** [rand bound] returns a value between [zero] and bound. *)
 
 	(* Many fields are similar to numbers and we want to be able to convert to/from then *)
-	exception Not_convertible
 	val of_int       : int -> t
 	val to_int       : t -> int
 	val of_float     : float -> t
@@ -185,8 +185,6 @@ module CheckedField (K : FIELD) =
 struct
 	include CheckedRing (K) (struct let v = true end)
 	(* CheckedRing will only include the RING elements of K : *)
-	exception Not_invertible
-	exception Not_convertible
 	let of_int = K.of_int
 	let to_int = K.to_int
 	let of_float = K.of_float
@@ -287,7 +285,6 @@ struct
 
 	let mul s a = Array.init Dim.v (fun i -> K.mul s a.(i))
 
-	exception Not_comparable
 	let compare a b = array_compare K.compare a b
 
 	let print fmt a =
@@ -404,7 +401,6 @@ struct
 
 	let mul s a = Array.init DimCol.v (fun i -> V.mul s a.(i))
 
-	exception Not_comparable
 	let compare a b = array_compare V.compare a b
 
 	let print fmt a =
