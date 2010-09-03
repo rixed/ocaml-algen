@@ -136,11 +136,7 @@ struct
 	open R
 	include GroupExtension (R)
 
-	let muls l =
-		let rec aux res = function
-			| [] -> res
-			| x::l' -> aux (mul res x) l' in
-		aux one l
+	let muls l = List.fold_left mul one l
 	
 	let square a = mul a a
 
@@ -378,9 +374,9 @@ sig
 	module V : VECTOR with module Dim = DimRow and module K = K
 
 	include GROUP with type t = V.t array (* .(col).(row) *)
-	val mul : K.t -> t -> t
 end
 
+(* FIXME: move me out of intf file (into matrix.ml ? *)
 module Matrix
 	(K : FIELD)
 	(DimCol : CONF_INT)
@@ -399,8 +395,6 @@ struct
 
 	let neg a = Array.init DimCol.v (fun i -> V.neg a.(i))
 
-	let mul s a = Array.init DimCol.v (fun i -> V.mul s a.(i))
-
 	let compare a b = array_compare V.compare a b
 
 	let print fmt a =
@@ -415,6 +409,7 @@ module MatrixExtension (M : MATRIX) =
 struct
 	open M
 	module Ve = ExtendedVector (V)
+	module Ke = Ve.Ke
 
 	let transpose m =
 		Array.init DimCol.v (fun vi ->
@@ -429,6 +424,73 @@ struct
 	let init f =
 		Array.init DimCol.v (fun c ->
 			Array.init DimRow.v (fun r -> f c r))
+
+	let mul_scal s a = Array.init DimCol.v (fun i -> V.mul s a.(i))
+
+	let mul_vec m v =
+		Array.init V.Dim.v (fun i ->
+			let rec aux res j =
+				if j < 0 then res else
+				let c = K.mul m.(j).(i) v.(j) in
+				aux (K.add res c) (j-1) in
+			aux K.zero (DimCol.v-1))
+
+	(* mul_vec m v0 = v -> inv_mul m v = v0 *)
+	let inv_mul mo vo =
+		let copy_mat m = init (fun c r -> m.(c).(r)) in
+		let m = copy_mat mo in
+		let v = Array.copy vo in
+		let swap_rows r1 r2 =
+			for c = 0 to DimCol.v - 1 do
+				let tmp = m.(c).(r1) in
+				m.(c).(r1) <- m.(c).(r2) ;
+				m.(c).(r2) <- tmp
+			done ;
+			let tmp = v.(r1) in
+			v.(r1) <- v.(r2) ;
+			v.(r2) <- tmp in
+		let divide_row r c =
+			let d = m.(c).(r) in
+			m.(c).(r) <- Ke.one ;
+			for c' = c + 1 to DimCol.v - 1 do
+				m.(c').(r) <- Ke.div m.(c').(r) d
+			done ;
+			v.(r) <- Ke.div v.(r) d in
+		let substract_row r_dst r c =
+			let s = m.(c).(r_dst) in
+			m.(c).(r_dst) <- Ke.zero ;
+			for c' = c to DimCol.v - 1 do
+				m.(c').(r_dst) <- Ke.sub m.(c').(r_dst) (Ke.mul s m.(c').(r))
+			done ;
+			v.(r_dst) <- Ke.sub v.(r_dst) (Ke.mul s v.(r)) in
+		let c = ref 0
+		and r = ref 0 in
+		while !c < DimCol.v && !r < DimRow.v do
+			(* Find pivot in column c, starting in row r *)
+			let maxr = ref !r in
+			for k = !r + 1 to DimRow.v - 1 do
+				if Ke.abs m.(!c).(k) > Ke.abs m.(!c).(!maxr) then
+					maxr := k
+			done ;
+			if 0 != Ke.compare m.(!c).(!maxr) Ke.zero then (
+				swap_rows !r !maxr ;
+				divide_row !r !c ;
+				for k = !r + 1 to DimRow.v - 1 do
+					substract_row k !r !c
+				done ;
+				incr r
+			) ;
+			incr c
+		done ;
+		(* Now solve *)
+		let res = Array.make DimCol.v Ke.zero in
+		for r = DimRow.v - 1 downto 0 do
+			res.(r) <- v.(r) ;
+			for c = r + 1 to DimCol.v - 1 do
+				res.(r) <- Ke.sub res.(r) (Ke.mul m.(c).(r) res.(c))
+			done
+		done ;
+		res
 
 	(* trace, determinant, etc... *)
 end
@@ -445,13 +507,10 @@ module MatrixOps
 	(M2 : MATRIX with module V.Dim = M1.DimCol and module K = M1.K) =
 struct
 	module K = M1.K
+	module M1e = ExtendedMatrix (M1)
+	module M2e = ExtendedMatrix (M2)
 
 	let mul (m1:M1.t) (m2:M2.t) =
-		Array.init M2.DimCol.v (fun vi ->
-			Array.init M1.V.Dim.v (fun si ->
-				let rec aux res k =
-					if k < 0 then res else
-					let c = K.mul m1.(k).(si) m2.(vi).(k) in
-					aux (K.add res c) (k-1) in
-				aux K.zero (M1.DimCol.v-1)))
+		Array.init M2.DimCol.v (fun i ->
+			M1e.mul_vec m1 m2.(i))
 end

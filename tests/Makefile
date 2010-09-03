@@ -1,7 +1,7 @@
 REQUIRES = algen
 OCAMLPATH = ../..
 
-PROGRAMS = test.byte bbox.byte
+PROGRAMS = test.byte bbox.byte matrix.byte
 all: $(PROGRAMS)
 opt: $(PROGRAMS:.byte=.opt)
 
