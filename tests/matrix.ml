@@ -11,6 +11,7 @@ module V = Vector (K) (Dim2)
 module Ve = ExtendedVector (V)
 module M1e = ExtendedMatrix (Matrix (K) (Dim3) (Dim2))	(* 3 columns and 2 rows, or 3 vectors of 2 scalars *)
 module M2e = ExtendedMatrix (Matrix (K) (Dim2) (Dim3))	(* the other way around *)
+module M3e = ExtendedMatrix (Matrix (K) (Dim2) (Dim2))	(* a mere 2x2 matrix *)
 module MO = MatrixOps (M1e) (M2e)
 
 let check_mul =
@@ -23,4 +24,9 @@ let check_mul =
 	assert (MO.mul
 		[| [| 1. ; 2. |] ; [| 3. ; 4. |] ; [| 5. ; 6. |] |]
 		[| [| 1. ; 2. ; 3. |] ; [| 4. ; 5. ; 6. |] |] =
-		[| [| 22. ; 28. |] ; [| 49. ; 64. |] |]) ;
+		[| [| 22. ; 28. |] ; [| 49. ; 64. |] |])
+
+let check_inv_mul =
+	assert (M3e.inv_mul
+		[| [| 2. ; 1. |] ; [| 1. ; 3. |] |]
+		[| 10. ; 15. |] = [| 3. ; 4. |])
