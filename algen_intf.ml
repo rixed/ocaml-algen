@@ -285,7 +285,7 @@ struct
 
 	let print fmt a =
 		Array.iteri (fun i s ->
-			if i = 0 then Format.fprintf fmt "@[{VEC:@ " ;
+			if i = 0 then Format.fprintf fmt "@[{VEC: " ;
 			K.print fmt s ;
 			if i < Dim.v - 1 then Format.fprintf fmt ",@ " else Format.fprintf fmt "}@]")
 			a
@@ -322,7 +322,7 @@ struct
 				res := K.add !res dual.(j')
 			done)
 
-	let oposite a =
+	let opposite a =
 		Array.init Dim.v (fun i -> K.neg a.(i))
 
 	let normalize a =
