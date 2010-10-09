@@ -291,6 +291,18 @@ struct
 			a
 end
 
+module type BBOX =
+sig
+	type vector
+	type t = Empty | Box of vector * vector
+	val empty    : t
+	val is_empty : t -> bool
+	val make     : vector -> t
+	val union    : t -> t -> t
+	val add      : t -> vector -> t
+	val print    : Format.formatter -> t -> unit
+end
+
 module VectorExtension (V : VECTOR) =
 struct
 	open V
@@ -331,7 +343,7 @@ struct
 
 	(* BBOX *)
 
-	module Bbox =
+	module Bbox : BBOX with type vector = t =
 	struct
 		type vector = t
 		type t = Empty | Box of vector * vector
