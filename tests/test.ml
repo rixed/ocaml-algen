@@ -5,46 +5,45 @@ open Algen_impl
 
 module CheckGroup (G : GROUP) =
 struct
-	module Ge = ExtendedGroup (CheckedGroup (G) (struct let v = true end))
 	let () =
-		assert (Ge.compare Ge.zero Ge.zero = 0) ;
-		assert (Ge.add Ge.zero Ge.zero = Ge.zero) ;
-		assert (Ge.neg Ge.zero = Ge.zero) ;
-		assert (Ge.sub Ge.zero Ge.zero = Ge.zero) ;
-		assert (Ge.adds [] = Ge.zero) ;
-		assert (Ge.adds [ Ge.zero ] = Ge.zero) ;
-		assert (Ge.min Ge.zero Ge.zero = Ge.zero) ;
-		assert (Ge.max Ge.zero Ge.zero = Ge.zero) ;
-		assert (Ge.abs Ge.zero = Ge.zero) ;
-		assert (Ge.double Ge.zero = Ge.zero)
+		assert (G.compare G.zero G.zero = 0) ;
+		assert (G.add G.zero G.zero = G.zero) ;
+		assert (G.neg G.zero = G.zero) ;
+		assert (G.sub G.zero G.zero = G.zero) ;
+		assert (G.adds [] = G.zero) ;
+		assert (G.adds [ G.zero ] = G.zero) ;
+		assert (G.min G.zero G.zero = G.zero) ;
+		assert (G.max G.zero G.zero = G.zero) ;
+		assert (G.abs G.zero = G.zero) ;
+		assert (G.double G.zero = G.zero)
 end
 
 module CheckRing (R : RING) =
 struct
 	module ChkGrp = CheckGroup (R)
-	module Re = ExtendedRing (CheckedRing (R) (struct let v = true end))
+	module R = Ring (CheckedRing (R) (struct let v = true end))
 	let () =
-		assert (Re.add Re.one Re.zero = Re.one) ;
-		assert (Re.add Re.zero Re.one = Re.one) ;
-		assert (Re.add Re.one (Re.neg Re.one) = Re.zero) ;
-		assert (Re.sub Re.one Re.one = Re.zero) ;
-		assert (Re.abs Re.one = Re.one) ;
-		assert (Re.abs (Re.neg Re.one) = Re.one) ;
-		assert (Re.mul Re.one Re.one = Re.one) ;
-		assert (Re.mul Re.zero Re.one = Re.zero) ;
-		assert (Re.mul Re.one Re.zero = Re.zero) ;
-		assert (Re.sqrt Re.one = Re.one) ;
-		assert (Re.muls [] = Re.one) ;
-		assert (Re.square Re.one = Re.one) ;
-		assert (Re.exponent Re.one 10 = Re.one)
+		assert (R.add R.one R.zero = R.one) ;
+		assert (R.add R.zero R.one = R.one) ;
+		assert (R.add R.one (R.neg R.one) = R.zero) ;
+		assert (R.sub R.one R.one = R.zero) ;
+		assert (R.abs R.one = R.one) ;
+		assert (R.abs (R.neg R.one) = R.one) ;
+		assert (R.mul R.one R.one = R.one) ;
+		assert (R.mul R.zero R.one = R.zero) ;
+		assert (R.mul R.one R.zero = R.zero) ;
+		assert (R.sqrt R.one = R.one) ;
+		assert (R.muls [] = R.one) ;
+		assert (R.square R.one = R.one) ;
+		assert (R.exponent R.one 10 = R.one)
 end
 
 module CheckField (K : FIELD) =
 struct
 	module ChkRng = CheckRing (K)
-	module Ke = ExtendedField (CheckedField (K))
+	module K = CheckedField (K)
 	let () =
-		assert (Ke.inv Ke.one = Ke.one)
+		assert (K.inv K.one = K.one)
 end
 
 module M1 = CheckField (FloatField)
@@ -52,5 +51,4 @@ module M2 = CheckField (IntField (struct let v = 10 end))
 module M3 = CheckField (IntField (struct let v = 0 end))
 module M4 = CheckField (NatIntField (struct let v = 10 end))
 module M5 = CheckField (NatIntField (struct let v = 0 end))
-
 

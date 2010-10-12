@@ -4,11 +4,10 @@ open Algen_intf
 open Algen_impl
 
 module K = FloatField
-module V = Vector (K) (struct let v = 2 end)
-module Ve = ExtendedVector (V)
-open Ve.Bbox
+module V = Algen_vector.Make (K) (struct let v = 2 end)
+open V.Bbox
 
-let v = Ve.make_unit 0
+let v = V.make_unit 0
 
 let check =
 	assert (is_empty empty) ;
