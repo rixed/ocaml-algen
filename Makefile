@@ -36,4 +36,4 @@ check: $(NAME).cma $(NAME).cmxa
 clean-spec:
 	@make -C tests clean
 
-include .depend
+-include .depend

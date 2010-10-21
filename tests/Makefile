@@ -13,4 +13,4 @@ include ../make.common
 .cmx.opt:
 	$(OCAMLOPT) -o $@ -package "$(REQUIRES)" -linkpkg $(OCAMLOPTFLAGS) $^
 
-include .depend
+-include .depend
