@@ -82,6 +82,10 @@ struct
 
 		let add b v = union b (make v)
 
+		let diagonal = function
+			| Empty -> zero
+			| Box (v1, v2) -> sub v2 v1
+
 		let print fmt = function
 			| Empty ->
 				Format.fprintf fmt "@[{BBOX:empty}@]"

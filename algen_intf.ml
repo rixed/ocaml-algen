@@ -279,6 +279,7 @@ sig
 	val make     : vector -> t
 	val union    : t -> t -> t
 	val add      : t -> vector -> t
+	val diagonal : t -> vector
 	val print    : Format.formatter -> t -> unit
 end
 
