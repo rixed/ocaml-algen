@@ -30,10 +30,10 @@ uninstall:
 reinstall: uninstall install
 
 check: $(NAME).cma $(NAME).cmxa
-	@make -C tests all opt
+	$(MAKE) -C tests all opt
 	@for i in tests/*.byte tests/*.opt ; do $$i || exit ; done ; echo "Ok"
 
 clean-spec:
-	@make -C tests clean
+	$(MAKE) -C tests clean
 
 -include .depend
