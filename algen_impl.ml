@@ -26,6 +26,9 @@ module Core_FloatField =
 struct
 	include FloatRing
 	let inv x = 1./.x
+	let half x = x *. 0.5
+	let ceil = ceil
+	let floor = floor
 	let rand = Random.float
 	let of_int = float_of_int
 	let to_int = int_of_float
@@ -77,6 +80,13 @@ struct
 	let div a b =
 		let m = Int64.div (Int64.shift_left (Int64.of_int a) Prec.v) (Int64.of_int b) in
 		Int64.to_int m
+	let trunc x = x land (lnot (one - 1))
+	let ceil x =
+		let t = trunc x in
+		if t = x then x else t + one
+	let floor x =
+		let t = trunc x in
+		if t = x then x else t
 	let half a = a asr 1
 	let inv s = div one s
 	let rand = Random.int
@@ -127,6 +137,13 @@ struct
 	let div a b =
 		let m = Int64.div (Int64.shift_left (Int64.of_nativeint a) Prec.v) (Int64.of_nativeint b) in
 		Int64.to_nativeint m
+	let trunc x = Nativeint.logand x (Nativeint.lognot (Nativeint.sub one 1n))
+	let ceil x =
+		let t = trunc x in
+		if t = x then x else Nativeint.add t one
+	let floor x =
+		let t = trunc x in
+		if t = x then x else t
 	let half a = Nativeint.shift_right a 1
 	let inv s = div one s
 	let rand = Random.nativeint

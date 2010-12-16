@@ -43,12 +43,20 @@ struct
 	module ChkRng = CheckRing (K)
 	module K = CheckedField (K)
 	let () =
-		assert (K.inv K.one = K.one)
+		assert (K.inv K.one = K.one) ;
+		assert (K.ceil  K.one = K.one) ;
+		assert (K.floor K.one = K.one) ;
+		let a = K.half K.one in
+		assert (K.floor a = K.zero) ;
+		assert (K.ceil a = K.one) ;
+		let b = K.neg a in
+		assert (K.floor b = K.neg K.one) ;
+		assert (K.ceil b = K.zero)
 end
 
 module M1 = CheckField (FloatField)
 module M2 = CheckField (IntField (struct let v = 10 end))
-module M3 = CheckField (IntField (struct let v = 0 end))
+module M3 = CheckField (IntField (struct let v = 1 end))
 module M4 = CheckField (NatIntField (struct let v = 10 end))
-module M5 = CheckField (NatIntField (struct let v = 0 end))
+module M5 = CheckField (NatIntField (struct let v = 1 end))
 

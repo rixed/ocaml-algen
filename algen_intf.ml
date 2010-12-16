@@ -172,6 +172,9 @@ sig
 	include RING (* where all elements but zero can be inversed for mul *)
 
 	val inv          : t -> t
+	val half         : t -> t
+	val floor        : t -> t
+	val ceil         : t -> t
 	val rand         : t -> t
 	(** [rand bound] returns a value between [zero] and bound. *)
 
@@ -192,8 +195,7 @@ module type FIELD =
 sig
 	include CORE_FIELD
 
-	val div  : t -> t -> t
-	val half : t -> t
+	val div   : t -> t -> t
 end
 
 module Field (K : CORE_FIELD) :
@@ -202,10 +204,6 @@ struct
 	include  K
 
 	let div a b = mul a (inv b)
-
-	let half a =
-		let semi_one = inv (add one one) in
-		mul semi_one a
 end
 
 module CheckedField (K : FIELD) =
@@ -224,6 +222,20 @@ struct
 	let to_string = K.to_string
 
 	let inv a = check_inversion K.inv mul a one
+
+	let half = K.half
+
+	let floor a =
+		let r = K.floor a in
+		assert (compare r a <= 0) ;
+		assert (compare r (sub a one) > 0) ;
+		r
+
+	let ceil a =
+		let r = K.ceil a in
+		assert (compare r a >= 0) ;
+		assert (compare r (add a one) < 0) ;
+		r
 
 	let rand bound =
 		let r = K.rand bound in
