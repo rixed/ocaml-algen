@@ -1,6 +1,7 @@
 NAME = algen
 
-all: $(NAME).cma
+all: byte opt
+byte: $(NAME).cma
 opt: $(NAME).cmxa
 
 include make.common
