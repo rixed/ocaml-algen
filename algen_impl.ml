@@ -1,5 +1,12 @@
 open Algen_intf
 
+(* Some common dimentions for the lazy *)
+
+module Dim1 : CONF_INT = struct let v = 1 end
+module Dim2 : CONF_INT = struct let v = 2 end
+module Dim3 : CONF_INT = struct let v = 3 end
+module Dim4 : CONF_INT = struct let v = 4 end
+
 (* Some FIELDs to play with. *)
 
 module Core_FloatGroup =
