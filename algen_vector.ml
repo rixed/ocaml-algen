@@ -80,6 +80,17 @@ struct
 				Box (Array.init Dim.v (fun i -> K.min am.(i) bm.(i)),
 				     Array.init Dim.v (fun i -> K.max aM.(i) bM.(i)))
 
+        let intersect b1 b2 = match b1, b2 with
+            | Empty, _ | _, Empty -> false
+            | Box (am, aM), Box (bm, bM) ->
+                let rec aux = function
+                    | 0 -> true
+                    | d ->
+                        let d = pred d in
+                        if K.compare bm.(d) aM.(d) > 0 || K.compare bM.(d) am.(d) < 0 then false
+                        else aux d in
+                aux Dim.v
+
 		let add b v = union b (make v)
 
 		let diagonal = function

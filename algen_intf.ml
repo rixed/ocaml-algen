@@ -140,7 +140,7 @@ struct
 
 	let exponent x n =
 		let res = ref one in
-		for i = 1 to n do
+		for _i = 1 to n do
 			res := mul !res x
 		done ;
 		!res
@@ -286,13 +286,14 @@ module type BBOX =
 sig
 	type vector
 	type t = Empty | Box of vector * vector
-	val empty    : t
-	val is_empty : t -> bool
-	val make     : vector -> t
-	val union    : t -> t -> t
-	val add      : t -> vector -> t
-	val diagonal : t -> vector
-	val print    : Format.formatter -> t -> unit
+	val empty     : t
+	val is_empty  : t -> bool
+	val make      : vector -> t
+	val union     : t -> t -> t
+    val intersect : t -> t -> bool
+	val add       : t -> vector -> t
+	val diagonal  : t -> vector
+	val print     : Format.formatter -> t -> unit
 end
 
 module type VECTOR =
@@ -304,6 +305,7 @@ sig
 	include GROUP with type t = K.t array
 	
 	val mul            : K.t -> t -> t
+	val half           : t -> t
 	val make_unit      : int -> t
 	val scalar_product : t -> t -> K.t
 	val norm2          : t -> K.t
