@@ -25,7 +25,6 @@ struct
 	include FloatGroup
 	let one = 1.
 	let mul = ( *.)
-	let sqrt = sqrt
 end
 module FloatRing : RING with type t = float = Ring (Core_FloatRing)
 
@@ -33,6 +32,7 @@ module Core_FloatField =
 struct
 	include FloatRing
 	let inv x = 1./.x
+	let sqrt = sqrt
 	let half x = x *. 0.5
 	let ceil = ceil
 	let floor = floor
@@ -76,7 +76,6 @@ struct
 	let mul a b =
 		let m = Int64.shift_right (Int64.mul (Int64.of_int a) (Int64.of_int b)) Prec.v in
 		Int64.to_int m
-	let sqrt s = fixed_of_float Prec.v (sqrt (float_of_fixed Prec.v s))
 end
 module IntRing (Prec : CONF_INT) : RING with type t = int = Ring (Core_IntRing (Prec))
 
@@ -87,6 +86,7 @@ struct
 	let div a b =
 		let m = Int64.div (Int64.shift_left (Int64.of_int a) Prec.v) (Int64.of_int b) in
 		Int64.to_int m
+	let sqrt s = fixed_of_float Prec.v (sqrt (float_of_fixed Prec.v s))
 	let trunc x = x land (lnot (one - 1))
 	let ceil x =
 		let t = trunc x in
@@ -132,7 +132,6 @@ struct
 	let mul a b =
 		let m = Int64.shift_right (Int64.mul (Int64.of_nativeint a) (Int64.of_nativeint b)) Prec.v in
 		Int64.to_nativeint m
-	let sqrt s = natfixed_of_float Prec.v (sqrt (float_of_natfixed Prec.v s))
 end
 module NatIntRing (Prec : CONF_INT) : RING with type t = nativeint = Ring (Core_NatIntRing (Prec))
 
@@ -144,6 +143,7 @@ struct
 	let div a b =
 		let m = Int64.div (Int64.shift_left (Int64.of_nativeint a) Prec.v) (Int64.of_nativeint b) in
 		Int64.to_nativeint m
+	let sqrt s = natfixed_of_float Prec.v (sqrt (float_of_natfixed Prec.v s))
 	let trunc x = Nativeint.logand x (Nativeint.lognot (Nativeint.sub one 1n))
 	let ceil x =
 		let t = trunc x in

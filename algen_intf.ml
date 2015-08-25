@@ -117,7 +117,6 @@ sig
 
 	val one  : t
 	val mul  : t -> t -> t
-	val sqrt : t -> t
 end
 
 module type RING =
@@ -157,12 +156,6 @@ struct
 
 	let mul a b =
 		check_assoc_and_neutral R.mul a b one Abelian.v
-
-	let sqrt a =
-		let b = R.sqrt a in
-		assert (eq a (R.mul b b)) ;
-		assert (eq (R.sqrt one) one) ;
-		b
 end
 
 (* FIELD *)
@@ -172,6 +165,7 @@ sig
 	include RING (* where all elements but zero can be inversed for mul *)
 
 	val inv          : t -> t
+	val sqrt         : t -> t
 	val half         : t -> t
 	val floor        : t -> t
 	val ceil         : t -> t
@@ -223,6 +217,12 @@ struct
 
 	let inv a = check_inversion K.inv mul a one
 
+	let sqrt a =
+		let b = K.sqrt a in
+		assert (eq a (K.mul b b)) ;
+		assert (eq (K.sqrt one) one) ;
+		b
+
 	let half = K.half
 
 	let floor a =
@@ -271,7 +271,7 @@ struct
 		v'
 end
 
-(* INTERRESTING CASE : K^n *)
+(* INTERESTING CASE : K^n *)
 
 (* Compare arrays of _same_length_ *)
 let array_compare elmt_compare a b =
