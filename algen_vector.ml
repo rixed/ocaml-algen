@@ -102,6 +102,12 @@ struct
 				Format.fprintf fmt "@[{BBOX:empty}@]"
 			| Box (am, aM) ->
 				Format.fprintf fmt "@[{BBOX:@ %a ->@ %a }@]" print am print aM
+
+        let translate b v = match b with
+            | Empty -> b
+            | Box (am, aM) ->
+                let add = Vector_Core_Group.add in
+                Box (add v am, add v aM)
 	end
 end
 

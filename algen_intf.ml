@@ -294,6 +294,7 @@ sig
 	val add       : t -> vector -> t
 	val diagonal  : t -> vector
 	val print     : Format.formatter -> t -> unit
+    val translate : t -> vector -> t
 end
 
 module type VECTOR =
