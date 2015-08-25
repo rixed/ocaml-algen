@@ -8,7 +8,7 @@ include make.common
 
 ML_SOURCES = algen_intf.ml algen_impl.ml algen_vector.ml algen_matrix.ml
 
-REQUIRES =
+REQUIRES = findlib
 
 .PHONY: all install uninstall reinstall
 
