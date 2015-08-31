@@ -200,6 +200,21 @@ struct
 	let div a b = mul a (inv b)
 end
 
+module type TRIGO =
+sig
+  include FIELD
+  val pi : t
+  val sin : t -> t
+  val cos : t -> t
+  val tan : t -> t
+  val asin : t -> t
+  val acos : t -> t
+  val atan : t -> t
+  val sinh : t -> t
+  val cosh : t -> t
+  val tanh : t -> t
+end
+
 module CheckedField (K : FIELD) =
 struct
 	include CheckedRing (K) (struct let v = true end)
@@ -341,6 +356,7 @@ sig
 	val mul_mat   : t -> t -> t
 	(** mul_mat works with compatibles matrices, the first one must be of
 	 * dimension DimCol, the other is not checked *)
+
 	val inv_mul   : t -> V.t -> V.t
 	(** [mul_vec m v0] = v  implies  [inv_mul m v] = v0 *)
 

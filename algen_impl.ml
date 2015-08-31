@@ -1,6 +1,6 @@
 open Algen_intf
 
-(* Some common dimentions for the lazy *)
+(* Some common dimensions for the lazy *)
 
 module Dim1 : CONF_INT = struct let v = 1 end
 module Dim2 : CONF_INT = struct let v = 2 end
@@ -51,6 +51,20 @@ end
 
 module FloatField : FIELD with type t = float = Field (Core_FloatField)
 
+module FloatTrigo : TRIGO with type t = float =
+struct
+  include FloatField
+  let pi = 4. *. atan 1.
+  let sin = sin
+  let cos = cos
+  let tan = tan
+  let asin = asin
+  let acos = acos
+  let atan = atan
+  let sinh = sinh
+  let cosh = cosh
+  let tanh = tanh
+end
 
 (* Fixed size precision based on int *)
 
@@ -109,6 +123,24 @@ struct
 	let to_string x = string_of_float (float_of_fixed Prec.v x)
 end
 
+module MakeTrigo (F : FIELD) =
+struct
+  include F
+  let pi = F.of_float (4. *. atan 1.)
+  let sin x = F.of_float @@ sin @@ F.to_float x
+  let cos x = F.of_float @@ cos @@ F.to_float x
+  let tan x = F.of_float @@ tan @@ F.to_float x
+  let asin x = F.of_float @@ asin @@ F.to_float x
+  let acos x = F.of_float @@ acos @@ F.to_float x
+  let atan x = F.of_float @@ atan @@ F.to_float x
+  let sinh x = F.of_float @@ sinh @@ F.to_float x
+  let cosh x = F.of_float @@ cosh @@ F.to_float x
+  let tanh x = F.of_float @@ tanh @@ F.to_float x
+end
+
+module IntTrigo (Prec : CONF_INT) : TRIGO with type t = int =
+  MakeTrigo (IntField (Prec))
+
 (* Same as above, but using nativeints *)
 
 let float_of_natfixed prec f = (Nativeint.to_float f) /. (Nativeint.to_float (Nativeint.shift_left 1n prec))
@@ -166,3 +198,5 @@ struct
 	let to_string x = string_of_float (float_of_natfixed Prec.v x)
 end
 
+module NatIntTrigo (Prec : CONF_INT) : TRIGO with type t = nativeint =
+  MakeTrigo (NatIntField(Prec))
