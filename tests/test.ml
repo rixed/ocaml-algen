@@ -32,7 +32,6 @@ struct
 		assert (R.mul R.one R.one = R.one) ;
 		assert (R.mul R.zero R.one = R.zero) ;
 		assert (R.mul R.one R.zero = R.zero) ;
-		assert (R.sqrt R.one = R.one) ;
 		assert (R.muls [] = R.one) ;
 		assert (R.square R.one = R.one) ;
 		assert (R.exponent R.one 10 = R.one)
@@ -44,6 +43,7 @@ struct
 	module K = CheckedField (K)
 	let () =
 		assert (K.inv K.one = K.one) ;
+		assert (K.sqrt K.one = K.one) ;
 		assert (K.ceil  K.one = K.one) ;
 		assert (K.floor K.one = K.one) ;
 		let a = K.half K.one in
