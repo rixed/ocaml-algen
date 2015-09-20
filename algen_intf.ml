@@ -30,6 +30,7 @@ sig
 	val abs    : t -> t
 	val double : t -> t
 	val eq     : t -> t -> bool
+	val cond   : bool -> t -> t -> t
 end
 
 module Group (G : CORE_GROUP) :
@@ -54,6 +55,8 @@ struct
 	let double a = add a a
 
 	let eq a b = 0 = compare a b
+
+	let cond c a b = if c then a else b
 end
 
 module CheckedGroup
