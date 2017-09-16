@@ -2,12 +2,8 @@ OCAMLC     = ocamlfind ocamlc
 OCAMLOPT   = ocamlfind ocamlopt
 OCAMLDEP   = ocamlfind ocamldep
 INCS       =
-OCAMLOPTFLAGS = $(INCS) -w Ae -g
-OCAMLFLAGS    = $(INCS) -w Ae -g
-
-CAMLINCLUDE = $(shell ocamlfind printconf stdlib)
-CPPFLAGS += -I $(CAMLINCLUDE)
-CFLAGS += -std=c99 -W -Wall
+OCAMLOPTFLAGS = $(INCS) -w Ae -g -annot
+OCAMLFLAGS    = $(INCS) -w Ae -g -annot
 
 # Common rules
 .SUFFIXES: .ml .mli .cmo .cmi .cmx
