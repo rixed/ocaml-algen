@@ -1,5 +1,4 @@
 description = "Basic generic numbers"
 version = "1"
-requires = "findlib"
 archive(byte) = "algen.cma"
 archive(native) = "algen.cmxa"

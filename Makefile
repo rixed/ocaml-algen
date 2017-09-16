@@ -8,7 +8,7 @@ include make.common
 
 ML_SOURCES = algen_intf.ml algen_impl.ml algen_vector.ml algen_matrix.ml
 
-REQUIRES = findlib
+REQUIRES =
 
 .PHONY: all install uninstall reinstall
 
@@ -22,7 +22,7 @@ $(NAME).cmxa: $(ML_XOBJS)
 	$(OCAMLOPT) -a -o $@ -package "$(REQUIRES)" $(OCAMLOPTFLAGS) $(ML_XOBJS)
 
 install: all
-	if test -f $(NAME).cmxa ; then extra="$(NAME).cmxa $(NAME).a" ; fi ; \
+	if test -f $(NAME).cmxa ; then extra="$(NAME).cmxa *.cmx $(NAME).a" ; fi ; \
 	ocamlfind install $(NAME) *.cmi algen_intf.ml $(NAME).cma META $$extra
 
 uninstall:

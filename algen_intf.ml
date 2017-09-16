@@ -334,7 +334,7 @@ sig
 	val normalize      : t -> t
 end
 
-(* Another interresting case : K^([1;n]x[1;p]) MATRIX *)
+(* Another interesting case : K^([1;n]x[1;p]) MATRIX *)
 
 module type CORE_MATRIX =
 sig
