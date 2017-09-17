@@ -15,7 +15,18 @@ struct
   let zero = 0.
   let add = (+.)
   let neg x = -.x
-  let compare = compare (* From Pervasive *)
+
+  let compare (a : float) (b : float) =
+    let c = a -. b in
+    match classify_float c with
+    | FP_normal | FP_infinite ->
+      if c > 0. then 1 else -1
+    | FP_zero | FP_subnormal -> 0
+    | FP_nan ->
+      let err =
+        string_of_float a ^" and "^ string_of_float b ^" are not comparable" in
+      failwith err
+
   let print ff s = Format.pp_print_float ff s
 end
 module FloatGroup : GROUP with type t = float = Group (Core_FloatGroup)
