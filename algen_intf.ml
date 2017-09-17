@@ -332,6 +332,19 @@ sig
   val vect_product   : t -> t -> t
   val opposite       : t -> t
   val normalize      : t -> t
+  val copy           : t -> t
+
+  (* Those operations modify their first operand ("i" is for inplace) *)
+
+  val muli : K.t -> t -> unit
+  val halfi : t -> unit
+  val addi : t -> t -> unit
+  val subi : t -> t -> unit
+  val oppositei : t -> unit
+  val normalizei : t -> unit
+
+  (** [copyi a b] copies [b] into [a] - ie. destination first *)
+  val copyi : t -> t -> unit
 end
 
 (* Another interesting case : K^([1;n]x[1;p]) MATRIX *)

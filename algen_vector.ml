@@ -61,6 +61,22 @@ struct
     let s = K.inv (norm a) in
     mul s a
 
+  let copy = Array.copy
+
+  (* Destructive operations *)
+
+  let map_inplace f a = Array.iteri (fun i x -> a.(i) <- f x) a
+  let map_inplace2 f a b = Array.iteri (fun i x -> a.(i) <- f x b.(i)) a
+  let muli s = map_inplace (K.mul s)
+  let halfi =  map_inplace K.half
+  let addi = map_inplace2 K.add
+  let subi = map_inplace2 K.sub
+  let oppositei = map_inplace K.neg
+  let normalizei a =
+    let s = K.inv (norm a) in
+    muli s a
+  let copyi = map_inplace2 (fun _ b -> b)
+
   (* BBOX *)
 
   module Bbox : BBOX with type vector = t =
