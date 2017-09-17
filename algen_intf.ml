@@ -143,6 +143,8 @@ sig
   val muls     : t list -> t
   val square   : t -> t
   val exponent : t -> int -> t
+  val succ   : t -> t
+  val pred   : t -> t
 
   module Infix : sig
     val ( +~ ) : t -> t -> t
@@ -175,6 +177,9 @@ struct
       res := mul !res x
     done ;
     !res
+
+  let succ x = add x one
+  let pred x = sub x one
 end
 
 module CheckedRing
