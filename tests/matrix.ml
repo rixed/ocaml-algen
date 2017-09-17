@@ -1,6 +1,4 @@
 (* Test Matrix operations. *)
-
-open Algen_intf
 open Algen_impl
 
 module Dim2 = struct let v = 2 end

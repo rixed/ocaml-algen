@@ -33,15 +33,16 @@ module FloatGroup : GROUP with type t = float = Group (Core_FloatGroup)
 
 module Core_FloatRing =
 struct
-  include FloatGroup
+  type t = float
   let one = 1.
   let mul = ( *.)
 end
-module FloatRing : RING with type t = float = Ring (Core_FloatRing)
+module FloatRing : RING with type t = float =
+  Ring (FloatGroup) (Core_FloatRing)
 
 module Core_FloatField =
 struct
-  include FloatRing
+  type t = float
   let inv x = 1./.x
   let sqrt = sqrt
   let half x = x *. 0.5
@@ -60,7 +61,8 @@ struct
   let to_string = string_of_float
 end
 
-module FloatField : FIELD with type t = float = Field (Core_FloatField)
+module FloatField : FIELD with type t = float =
+  Field (FloatRing) (Core_FloatField)
 
 module FloatTrigo : TRIGO with type t = float =
 struct
@@ -96,17 +98,19 @@ module IntGroup (Prec : CONF_INT) : GROUP with type t = int = Group (Core_IntGro
 
 module Core_IntRing (Prec : CONF_INT) =
 struct
-  include IntGroup (Prec)
+  type t = int
   let one = 1 lsl Prec.v
   let mul a b =
     let m = Int64.shift_right (Int64.mul (Int64.of_int a) (Int64.of_int b)) Prec.v in
     Int64.to_int m
 end
-module IntRing (Prec : CONF_INT) : RING with type t = int = Ring (Core_IntRing (Prec))
+module IntRing (Prec : CONF_INT) : RING with type t = int =
+  Ring (IntGroup (Prec)) (Core_IntRing (Prec))
 
-module IntField (Prec : CONF_INT) =
+module Core_IntField (Prec : CONF_INT) =
 struct
-  include IntRing (Prec)
+  type t = int
+  include (Core_IntRing (Prec) : CORE_RING with type t := t) (* for [one] *)
 
   let div a b =
     let m = Int64.div (Int64.shift_left (Int64.of_int a) Prec.v) (Int64.of_int b) in
@@ -133,6 +137,8 @@ struct
   let of_string s = fixed_of_float Prec.v (float_of_string s)
   let to_string x = string_of_float (float_of_fixed Prec.v x)
 end
+module IntField (Prec : CONF_INT) : FIELD with type t = int =
+  Field (IntRing (Prec)) (Core_IntField (Prec))
 
 module MakeTrigo (F : FIELD) =
 struct
@@ -166,22 +172,24 @@ struct
   let compare = Nativeint.compare
   let print ff s = Format.fprintf ff "%g" (float_of_natfixed Prec.v s)
 end
-module NatIntGroup (Prec : CONF_INT) : GROUP with type t = nativeint = Group (Core_NatIntGroup (Prec))
+module NatIntGroup (Prec : CONF_INT) : GROUP with type t = nativeint =
+  Group (Core_NatIntGroup (Prec))
 
 module Core_NatIntRing (Prec : CONF_INT) =
 struct
-  include NatIntGroup (Prec)
+  type t = nativeint
   let one = Nativeint.shift_left 1n Prec.v
   let mul a b =
     let m = Int64.shift_right (Int64.mul (Int64.of_nativeint a) (Int64.of_nativeint b)) Prec.v in
     Int64.to_nativeint m
 end
-module NatIntRing (Prec : CONF_INT) : RING with type t = nativeint = Ring (Core_NatIntRing (Prec))
+module NatIntRing (Prec : CONF_INT) : RING with type t = nativeint =
+  Ring (NatIntGroup (Prec)) (Core_NatIntRing (Prec))
 
-module NatIntField (Prec : CONF_INT)
-  : FIELD with type t = nativeint =
+module Core_NatIntField (Prec : CONF_INT) =
 struct
-  include NatIntRing (Prec)
+  type t = nativeint
+  include (Core_NatIntRing (Prec) : CORE_RING with type t := t) (* for [one] *)
 
   let div a b =
     let m = Int64.div (Int64.shift_left (Int64.of_nativeint a) Prec.v) (Int64.of_nativeint b) in
@@ -208,6 +216,8 @@ struct
   let of_string s = natfixed_of_float Prec.v (float_of_string s)
   let to_string x = string_of_float (float_of_natfixed Prec.v x)
 end
+module NatIntField (Prec : CONF_INT) : FIELD with type t = nativeint =
+  Field (NatIntRing (Prec)) (Core_NatIntField (Prec))
 
 module NatIntTrigo (Prec : CONF_INT) : TRIGO with type t = nativeint =
   MakeTrigo (NatIntField(Prec))

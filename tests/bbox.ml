@@ -1,6 +1,4 @@
 (* Test BBoxes. *)
-
-open Algen_intf
 open Algen_impl
 
 module K = FloatField

@@ -31,6 +31,13 @@ sig
   val double : t -> t
   val eq     : t -> t -> bool
   val cond   : bool -> t -> t -> t
+
+  module Infix : sig
+    val ( +~ ) : t -> t -> t
+    val ( -~ ) : t -> t -> t
+    val ( ~-~ ) : t -> t
+    val ( =~ ) : t -> t -> bool
+  end
 end
 
 module Group (G : CORE_GROUP) :
@@ -57,6 +64,13 @@ struct
   let eq a b = 0 = compare a b
 
   let cond c a b = if c then a else b
+
+  module Infix = struct
+    let ( +~ ) = add
+    let ( -~ ) = sub
+    let ( ~-~ ) = neg
+    let ( =~ ) = eq
+  end
 end
 
 module CheckedGroup
@@ -116,7 +130,7 @@ end
 
 module type CORE_RING =
 sig
-  include GROUP
+  type t
 
   val one  : t
   val mul  : t -> t -> t
@@ -129,12 +143,27 @@ sig
   val muls     : t list -> t
   val square   : t -> t
   val exponent : t -> int -> t
+
+  module Infix : sig
+    val ( +~ ) : t -> t -> t
+    val ( -~ ) : t -> t -> t
+    val ( ~-~ ) : t -> t
+    val ( *~ ) : t -> t -> t
+    val ( =~ ) : t -> t -> bool
+  end
+
+  include GROUP with type t := t and module Infix := Infix
 end
 
-module Ring (R : CORE_RING) :
+module Ring (G : GROUP) (R : CORE_RING with type t = G.t) :
   RING with type t = R.t =
 struct
   include R
+  module Infix = struct
+    include G.Infix
+    let ( *~ ) = R.mul
+  end
+  include (G : GROUP with type t := t and module Infix := Infix)
 
   let muls l = List.fold_left mul one l
 
@@ -146,26 +175,26 @@ struct
       res := mul !res x
     done ;
     !res
-
 end
 
 module CheckedRing
   (R : RING)
   (Abelian : CONF_BOOL) =
 struct
-  include CheckedGroup (R) (struct let v = true end)
-  (* CheckedGroup will only include from R the elements of a GROUP : *)
-  let one = R.one
-
+  module CG = CheckedGroup (R) (struct let v = true end)
+  include R
+  let add = CG.add
+  let neg = CG.neg
+  let compare = CG.compare
   let mul a b =
-    check_assoc_and_neutral R.mul a b one Abelian.v
+    CG.check_assoc_and_neutral R.mul a b one Abelian.v
 end
 
 (* FIELD *)
 
 module type CORE_FIELD =
 sig
-  include RING (* where all elements but zero can be inversed for mul *)
+  type t
 
   val inv          : t -> t
   val sqrt         : t -> t
@@ -192,15 +221,35 @@ module type FIELD =
 sig
   include CORE_FIELD
 
+  module Infix : sig
+    val ( +~ ) : t -> t -> t
+    val ( -~ ) : t -> t -> t
+    val ( ~-~ ) : t -> t
+    val ( *~ ) : t -> t -> t
+    val ( /~ ) : t -> t -> t
+    val ( =~ ) : t -> t -> bool
+  end
+
+  include RING with type t := t and module Infix := Infix
+    (* where all elements but zero can be inversed for mul *)
+
   val div   : t -> t -> t
 end
 
-module Field (K : CORE_FIELD) :
-  FIELD with type t = K.t =
+module Field (R : RING)
+             (K : CORE_FIELD with type t = R.t) :
+  FIELD with type t = R.t =
 struct
-  include  K
+  include K
 
-  let div a b = mul a (inv b)
+  let div a b = R.mul a (inv b)
+
+  module Infix = struct
+    include R.Infix
+    let ( /~ ) = div
+  end
+
+  include (R : RING with type t := t and module Infix := Infix)
 end
 
 module type TRIGO =
@@ -220,20 +269,14 @@ end
 
 module CheckedField (K : FIELD) =
 struct
-  include CheckedRing (K) (struct let v = true end)
-  (* CheckedRing will only include the RING elements of K : *)
-  let of_int = K.of_int
-  let to_int = K.to_int
-  let of_float = K.of_float
-  let to_float = K.to_float
-  let of_nativeint = K.of_nativeint
-  let to_nativeint = K.to_nativeint
-  let of_int64 = K.of_int64
-  let to_int64 = K.to_int64
-  let of_string = K.of_string
-  let to_string = K.to_string
+  include K
+  module CR = CheckedRing (K) (struct let v = true end)
+  let add = CR.CG.add
+  let neg = CR.CG.neg
+  let compare = CR.CG.compare
+  let mul = CR.mul
 
-  let inv a = check_inversion K.inv mul a one
+  let inv a = CR.CG.check_inversion K.inv mul a one
 
   let sqrt a =
     let b = K.sqrt a in

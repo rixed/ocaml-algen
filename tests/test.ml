@@ -21,7 +21,7 @@ end
 module CheckRing (R : RING) =
 struct
 	module ChkGrp = CheckGroup (R)
-	module R = Ring (CheckedRing (R) (struct let v = true end))
+	module R = CheckedRing (R) (struct let v = true end)
 	let () =
 		assert (R.add R.one R.zero = R.one) ;
 		assert (R.add R.zero R.one = R.one) ;
