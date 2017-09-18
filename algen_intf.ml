@@ -37,6 +37,10 @@ sig
     val ( -~ ) : t -> t -> t
     val ( ~-~ ) : t -> t
     val ( =~ ) : t -> t -> bool
+    val ( <~ ) : t -> t -> bool
+    val ( <=~ ) : t -> t -> bool
+    val ( >~ ) : t -> t -> bool
+    val ( >=~ ) : t -> t -> bool
   end
 end
 
@@ -70,6 +74,10 @@ struct
     let ( -~ ) = sub
     let ( ~-~ ) = neg
     let ( =~ ) = eq
+    let ( <~ ) a b = compare a b < 0
+    let ( <=~ ) a b = compare a b <= 0
+    let ( >~ ) a b = compare a b > 0
+    let ( >=~ ) a b = compare a b >= 0
   end
 end
 
@@ -152,6 +160,10 @@ sig
     val ( ~-~ ) : t -> t
     val ( *~ ) : t -> t -> t
     val ( =~ ) : t -> t -> bool
+    val ( <~ ) : t -> t -> bool
+    val ( <=~ ) : t -> t -> bool
+    val ( >~ ) : t -> t -> bool
+    val ( >=~ ) : t -> t -> bool
   end
 
   include GROUP with type t := t and module Infix := Infix
@@ -233,6 +245,10 @@ sig
     val ( *~ ) : t -> t -> t
     val ( /~ ) : t -> t -> t
     val ( =~ ) : t -> t -> bool
+    val ( <~ ) : t -> t -> bool
+    val ( <=~ ) : t -> t -> bool
+    val ( >~ ) : t -> t -> bool
+    val ( >=~ ) : t -> t -> bool
   end
 
   include RING with type t := t and module Infix := Infix
