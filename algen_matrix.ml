@@ -24,6 +24,7 @@ struct
         V.print fmt v ;
         if i < DimCol.v - 1 then Format.fprintf fmt ",@ " else Format.fprintf fmt "}@]"
       ) a
+    let rand b = Array.init DimCol.v (fun i -> V.rand b.(i))
   end
 
   include Group (Matrix_Core_Group)

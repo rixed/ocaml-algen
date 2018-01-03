@@ -21,6 +21,7 @@ struct
         K.print fmt s ;
         if i < Dim.v - 1 then Format.fprintf fmt ",@ " else Format.fprintf fmt "}@]")
         a
+    let rand b = Array.init Dim.v (fun i -> K.rand b.(i))
   end
 
   include Group (Vector_Core_Group)

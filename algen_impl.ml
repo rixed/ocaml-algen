@@ -28,6 +28,8 @@ struct
       failwith err
 
   let print ff s = Format.pp_print_float ff s
+
+  let rand = Random.float
 end
 module FloatGroup : GROUP with type t = float = Group (Core_FloatGroup)
 
@@ -48,7 +50,6 @@ struct
   let half x = x *. 0.5
   let ceil = ceil
   let floor = floor
-  let rand = Random.float
   let of_int = float_of_int
   let to_int = int_of_float
   let of_float x = x
@@ -93,6 +94,7 @@ struct
   let compare = compare
   let dec_mask = (1 lsl (Prec.v)) - 1
   let print ff s = Format.fprintf ff "%g" (float_of_fixed Prec.v s)
+  let rand = Random.int
 end
 module IntGroup (Prec : CONF_INT) : GROUP with type t = int = Group (Core_IntGroup (Prec))
 
@@ -125,7 +127,6 @@ struct
     if t = x then x else t
   let half a = a asr 1
   let inv s = div one s
-  let rand = Random.int
   let of_int x = x lsl Prec.v
   let to_int x = x asr Prec.v
   let of_float = fixed_of_float Prec.v
@@ -171,6 +172,7 @@ struct
   let neg = Nativeint.neg
   let compare = Nativeint.compare
   let print ff s = Format.fprintf ff "%g" (float_of_natfixed Prec.v s)
+  let rand = Random.nativeint
 end
 module NatIntGroup (Prec : CONF_INT) : GROUP with type t = nativeint =
   Group (Core_NatIntGroup (Prec))
@@ -204,7 +206,6 @@ struct
     if t = x then x else t
   let half a = Nativeint.shift_right a 1
   let inv s = div one s
-  let rand = Random.nativeint
   let of_int x = Nativeint.shift_left (Nativeint.of_int x) Prec.v
   let to_int x = Nativeint.to_int (Nativeint.shift_right x Prec.v)
   let of_float = natfixed_of_float Prec.v

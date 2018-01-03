@@ -17,6 +17,8 @@ sig
   val neg     : t -> t
   val compare : t -> t -> int
   val print   : Format.formatter -> t -> unit
+  val rand    : t -> t
+  (** [rand bound] returns a value between [zero] and bound. *)
 end
 
 module type GROUP =
@@ -218,8 +220,6 @@ sig
   val half         : t -> t
   val floor        : t -> t
   val ceil         : t -> t
-  val rand         : t -> t
-  (** [rand bound] returns a value between [zero] and bound. *)
 
   (* Many fields are similar to numbers and we want to be able to convert to/from then *)
   val of_int       : int -> t
