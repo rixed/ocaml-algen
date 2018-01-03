@@ -390,6 +390,7 @@ sig
   val mul            : K.t -> t -> t
   val half           : t -> t
   val make_unit      : int -> t
+  val one            : t
   val scalar_product : t -> t -> K.t
   val norm2          : t -> K.t
   val norm           : t -> K.t

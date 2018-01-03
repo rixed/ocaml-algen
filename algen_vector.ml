@@ -30,6 +30,8 @@ struct
 
   let make_unit d = Array.init Dim.v (fun i -> if i = d then K.one else K.zero)
 
+  let one = Array.make Dim.v K.one
+
   let sub a b = Array.init Dim.v (fun i -> K.sub a.(i) b.(i))
 
   let half a = Array.init Dim.v (fun i -> K.half a.(i))
